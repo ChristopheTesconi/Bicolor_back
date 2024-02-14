@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -38,6 +40,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $UpdatedAt = null;
+
+    #[ORM\OneToMany(targetEntity: Scores::class, mappedBy: 'user')]
+    private Collection $scores;
+
+    #[ORM\OneToMany(targetEntity: Comments::class, mappedBy: 'user')]
+    private Collection $comment;
+
+    public function __construct()
+    {
+        $this->scores = new ArrayCollection();
+        $this->comment = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -153,6 +167,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt(?\DateTimeImmutable $UpdatedAt): static
     {
         $this->UpdatedAt = $UpdatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Scores>
+     */
+    public function getScores(): Collection
+    {
+        return $this->scores;
+    }
+
+    public function addScore(Scores $score): static
+    {
+        if (!$this->scores->contains($score)) {
+            $this->scores->add($score);
+            $score->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScore(Scores $score): static
+    {
+        if ($this->scores->removeElement($score)) {
+            // set the owning side to null (unless already changed)
+            if ($score->getUser() === $this) {
+                $score->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comments>
+     */
+    public function getComment(): Collection
+    {
+        return $this->comment;
+    }
+
+    public function addComment(Comments $comment): static
+    {
+        if (!$this->comment->contains($comment)) {
+            $this->comment->add($comment);
+            $comment->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comments $comment): static
+    {
+        if ($this->comment->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getUser() === $this) {
+                $comment->setUser(null);
+            }
+        }
 
         return $this;
     }

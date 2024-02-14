@@ -28,6 +28,12 @@ class Comments
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $UpdatedAt = null;
 
+    #[ORM\ManyToOne(inversedBy: 'comment')]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(inversedBy: 'comments')]
+    private ?Games $commented = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -89,6 +95,30 @@ class Comments
     public function setUpdatedAt(?\DateTimeImmutable $UpdatedAt): static
     {
         $this->UpdatedAt = $UpdatedAt;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCommented(): ?Games
+    {
+        return $this->commented;
+    }
+
+    public function setCommented(?Games $commented): static
+    {
+        $this->commented = $commented;
 
         return $this;
     }
